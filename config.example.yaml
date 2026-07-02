@@ -4,8 +4,26 @@ user:
 
 calendar:
   mode: draft_only
-  provider: none
+  provider: input
   default_calendar: null
+  providers:
+    input:
+      enabled: true
+    json_file:
+      enabled: false
+      events_file: examples/events.json
+    google_ics:
+      enabled: false
+      # Keep real private ICS URLs in config.yaml or env, never in git.
+      ics_url_env: GOOGLE_CALENDAR_ICS_URL
+    apple_ics:
+      enabled: false
+      # Export from Apple Calendar and point to the local .ics file.
+      ics_file: ~/Downloads/calendar.ics
+    feishu_lark_cli:
+      enabled: false
+      calendar_id: YOUR_FEISHU_CALENDAR_ID
+      identity: user
 
 policy:
   path: calendar-policy.md

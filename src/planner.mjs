@@ -55,7 +55,7 @@ export function buildDraft(input, options = {}) {
     mode: 'draft_only',
     period: input.period,
     timezone,
-    events,
+    events: events.sort((a, b) => new Date(a.start) - new Date(b.start)),
     warnings,
     writeback: {
       supported: false,
@@ -186,5 +186,5 @@ function offsetForTimezone(timezone) {
 }
 
 function timeRange(event) {
-  return `${event.start.slice(11, 16)}-${event.end.slice(11, 16)}`;
+  return `${event.start.slice(0, 10)} ${event.start.slice(11, 16)}-${event.end.slice(11, 16)}`;
 }

@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { buildDraft, explainDraft, formatMarkdown } from '../src/planner.mjs';
+import { collectEvents, formatEventsMarkdown, mergeCollectedEvents } from '../src/providers.mjs';
 
 const HELP = `calendar-planning-os
 
@@ -11,11 +12,13 @@ Usage:
   calendar-planning-os --help
   calendar-planning-os draft-week --input examples/week-input.json [--format json|markdown|both]
   calendar-planning-os draft-day --input examples/day-input.json [--format json|markdown|both]
+  calendar-planning-os collect-events --input examples/week-input.json --provider input|json-file|google-ics|apple-ics|feishu-lark-cli
   calendar-planning-os explain --input examples/week-input.json
   calendar-planning-os writeback --draft latest
 
 Notes:
   - draft-week and draft-day produce draft output only.
+  - Feishu, Google, and Apple providers collect existing events only.
   - writeback is disabled in this alpha skeleton.
 `;
 
@@ -74,14 +77,30 @@ async function main() {
   if (command === 'draft-week' || command === 'draft-day') {
     const input = readJson(flags.input);
     const expectedPeriod = command === 'draft-week' ? 'week' : 'day';
-    const draft = buildDraft(input, { expectedPeriod });
+    const events = await collectEvents(input, flags);
+    const draftInput = mergeCollectedEvents(input, events, flags.provider || 'input');
+    const draft = buildDraft(draftInput, { expectedPeriod });
     printDraft(draft, flags.format || 'both');
+    return;
+  }
+
+  if (command === 'collect-events') {
+    const input = readJson(flags.input);
+    const provider = flags.provider || 'input';
+    const events = await collectEvents(input, flags);
+    if ((flags.format || 'json') === 'markdown') {
+      console.log(formatEventsMarkdown(events, provider));
+    } else {
+      console.log(JSON.stringify({ provider, events }, null, 2));
+    }
     return;
   }
 
   if (command === 'explain') {
     const input = readJson(flags.input);
-    const draft = buildDraft(input, { expectedPeriod: input.period || 'week' });
+    const events = await collectEvents(input, flags);
+    const draftInput = mergeCollectedEvents(input, events, flags.provider || 'input');
+    const draft = buildDraft(draftInput, { expectedPeriod: input.period || 'week' });
     console.log(explainDraft(draft));
     return;
   }
