@@ -1,0 +1,28 @@
+# Copy this file to routines.yaml and edit it locally.
+# Do not commit personal routines if they contain private details.
+
+timezone: America/Toronto
+
+fixed_routines:
+  - title: Lunch
+    days: [mon, tue, wed, thu, fri]
+    time: "12:00-13:00"
+    type: recovery
+    protected: true
+
+  - title: Exercise
+    days: [mon, wed, fri]
+    time: "18:00-19:00"
+    type: recovery
+    protected: true
+
+  - title: Daily review
+    days: [mon, tue, wed, thu, fri]
+    time: "20:30-20:45"
+    type: review
+    protected: false
+
+routine_rules:
+  - Existing calendar events override these examples.
+  - Protected routines should not be moved unless the user explicitly asks.
+  - Non-protected routines can move when the day is crowded.
