@@ -1,6 +1,6 @@
 const DEFAULT_WINDOWS = {
-  deep_work: ['09:30-11:30'],
-  admin: ['14:00-15:00'],
+  deep_work: ['09:30-11:30', '15:30-17:00'],
+  admin: ['14:00-15:00', '16:30-17:00'],
   review: ['20:00-20:30'],
   buffer: ['16:00-16:30'],
   recovery: ['12:00-13:00']
@@ -22,7 +22,7 @@ export function buildDraft(input, options = {}) {
   const warnings = [];
   const events = [];
   const existingEvents = input.existingEvents || [];
-  const tasks = [...(input.tasks || [])].sort(compareTasks);
+  const tasks = [...(input.tasks || [])].sort((a, b) => compareTasks(a, b, startDate));
   const dayUsage = new Map();
 
   for (const task of tasks) {
@@ -30,9 +30,10 @@ export function buildDraft(input, options = {}) {
     const windowList = windowsForType(input.policy || {}, type);
     let placed = false;
 
-    for (let dayOffset = 0; dayOffset < days && !placed; dayOffset += 1) {
+    for (const dayOffset of dayOrderForTask(task, startDate, days)) {
       const date = addDays(startDate, dayOffset);
       if (!canPlaceTypeOnDay(dayUsage, date, type, input.policy || {})) continue;
+      if (!canFitDayCapacity(dayUsage, date, task, input.policy || {})) continue;
 
       for (const window of windowList) {
         const candidate = candidateEvent(task, type, date, window, timezone);
@@ -40,9 +41,12 @@ export function buildDraft(input, options = {}) {
         if (conflict) continue;
         events.push(candidate);
         markUsage(dayUsage, date, type);
+        markMinutes(dayUsage, date, minutesBetween(candidate.start, candidate.end));
+        addBufferIfNeeded(events, existingEvents, candidate, input.policy || {}, timezone, dayUsage);
         placed = true;
         break;
       }
+      if (placed) break;
     }
 
     if (!placed) {
@@ -55,7 +59,7 @@ export function buildDraft(input, options = {}) {
     mode: 'draft_only',
     period: input.period,
     timezone,
-    events: events.sort((a, b) => new Date(a.start) - new Date(b.start)),
+    events: sortEvents(events),
     warnings,
     writeback: {
       supported: false,
@@ -106,9 +110,13 @@ function validateInput(input, expectedPeriod) {
   if (input.existingEvents && !Array.isArray(input.existingEvents)) throw new Error('existingEvents must be an array.');
 }
 
-function compareTasks(a, b) {
+function compareTasks(a, b, startDate) {
   const priority = { P0: 0, P1: 1, P2: 2, P3: 3 };
-  return (priority[a.priority] ?? 9) - (priority[b.priority] ?? 9);
+  const priorityDiff = (priority[a.priority] ?? 9) - (priority[b.priority] ?? 9);
+  if (priorityDiff !== 0) return priorityDiff;
+  const dueDiff = daysUntil(a.dueDate, startDate) - daysUntil(b.dueDate, startDate);
+  if (dueDiff !== 0) return dueDiff;
+  return Number(b.estimatedMinutes || 0) - Number(a.estimatedMinutes || 0);
 }
 
 function normalizeType(type) {
@@ -124,9 +132,17 @@ function windowsForType(policy, type) {
 }
 
 function canPlaceTypeOnDay(dayUsage, date, type, policy) {
-  if (type !== 'deep_work') return true;
-  const usage = dayUsage.get(date)?.deep_work || 0;
-  return usage < Number(policy.maxDeepWorkBlocksPerDay || 2);
+  const usage = dayUsage.get(date) || {};
+  if (type === 'deep_work') return (usage.deep_work || 0) < Number(policy.maxDeepWorkBlocksPerDay || 2);
+  if (type === 'admin') return (usage.admin || 0) < Number(policy.maxAdminBlocksPerDay || 2);
+  if (type === 'review') return (usage.review || 0) < Number(policy.maxReviewBlocksPerDay || 1);
+  return true;
+}
+
+function canFitDayCapacity(dayUsage, date, task, policy) {
+  const usage = dayUsage.get(date) || {};
+  const maxMinutes = Number(policy.maxDraftedMinutesPerDay || 300);
+  return Number(usage.minutes || 0) + Number(task.estimatedMinutes || 60) <= maxMinutes;
 }
 
 function markUsage(dayUsage, date, type) {
@@ -135,12 +151,19 @@ function markUsage(dayUsage, date, type) {
   dayUsage.set(date, usage);
 }
 
+function markMinutes(dayUsage, date, minutes) {
+  const usage = dayUsage.get(date) || {};
+  usage.minutes = (usage.minutes || 0) + minutes;
+  dayUsage.set(date, usage);
+}
+
 function candidateEvent(task, type, date, window, timezone) {
   const [startTime, endTime] = window.split('-');
   const start = `${date}T${startTime}:00${offsetForTimezone(timezone)}`;
   const hardEnd = `${date}T${endTime}:00${offsetForTimezone(timezone)}`;
   const estimatedEnd = addMinutesLocal(start, Number(task.estimatedMinutes || 60));
-  const end = new Date(estimatedEnd) < new Date(hardEnd) ? estimatedEnd : hardEnd;
+  const clipped = new Date(estimatedEnd) > new Date(hardEnd);
+  const end = clipped ? hardEnd : estimatedEnd;
   const label = TYPE_LABELS[type] || 'Work';
   return {
     title: `${label}: ${task.title}`,
@@ -149,8 +172,30 @@ function candidateEvent(task, type, date, window, timezone) {
     type,
     sourceTaskIds: task.id ? [task.id] : [],
     confidence: 'medium',
+    warnings: clipped ? [`Estimated ${task.estimatedMinutes || 60} minutes, but window ends earlier.`] : []
+  };
+}
+
+function addBufferIfNeeded(events, existingEvents, previous, policy, timezone, dayUsage) {
+  if (policy.includeBuffers === false) return;
+  if (previous.type !== 'deep_work') return;
+  const minutes = Number(policy.defaultBufferMinutes || 30);
+  if (minutes <= 0) return;
+  const start = previous.end;
+  const end = addMinutesLocal(start, minutes);
+  const candidate = {
+    title: 'Buffer: transition after deep work',
+    start,
+    end,
+    type: 'buffer',
+    sourceTaskIds: previous.sourceTaskIds,
+    confidence: 'high',
     warnings: []
   };
+  if (firstConflict(candidate, existingEvents.concat(events))) return;
+  events.push(candidate);
+  markUsage(dayUsage, candidate.start.slice(0, 10), 'buffer');
+  markMinutes(dayUsage, candidate.start.slice(0, 10), minutes);
 }
 
 function firstConflict(candidate, events) {
@@ -165,6 +210,44 @@ function addDays(date, days) {
   const parsed = new Date(`${date}T00:00:00Z`);
   parsed.setUTCDate(parsed.getUTCDate() + days);
   return parsed.toISOString().slice(0, 10);
+}
+
+function dayOrderForTask(task, startDate, days) {
+  const all = Array.from({ length: days }, (_, index) => index);
+  if (task.preferredDate) {
+    const preferred = daysBetween(startDate, task.preferredDate);
+    if (preferred >= 0 && preferred < days) {
+      return [preferred, ...all.filter((day) => day !== preferred)];
+    }
+  }
+  if (task.dueDate) {
+    const due = daysBetween(startDate, task.dueDate);
+    if (due >= 0 && due < days) {
+      const beforeDue = all.filter((day) => day <= due);
+      const afterDue = all.filter((day) => day > due);
+      return beforeDue.concat(afterDue);
+    }
+  }
+  return all;
+}
+
+function daysUntil(date, startDate) {
+  if (!date) return Number.MAX_SAFE_INTEGER;
+  return daysBetween(startDate, date);
+}
+
+function daysBetween(startDate, endDate) {
+  const start = new Date(`${startDate}T00:00:00Z`);
+  const end = new Date(`${endDate}T00:00:00Z`);
+  return Math.round((end.getTime() - start.getTime()) / 86400000);
+}
+
+function minutesBetween(start, end) {
+  return Math.max(0, Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000));
+}
+
+function sortEvents(events) {
+  return events.sort((a, b) => new Date(a.start) - new Date(b.start));
 }
 
 function addMinutesLocal(iso, minutes) {

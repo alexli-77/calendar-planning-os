@@ -16,6 +16,10 @@ if (!Array.isArray(parsed.events) || parsed.events.length === 0) throw new Error
 if (parsed.writeback.supported !== false) throw new Error('writeback must be disabled');
 const deepWork = parsed.events.find((event) => event.sourceTaskIds.includes('LEO-111'));
 if (!deepWork || !deepWork.end.includes('T11:00:00')) throw new Error('90-minute deep work block should end at 11:00');
+const buffer = parsed.events.find((event) => event.type === 'buffer' && event.sourceTaskIds.includes('LEO-111'));
+if (!buffer || buffer.start !== deepWork.end) throw new Error('deep work should receive an immediate transition buffer');
+assertChronological(parsed.events);
+assertNoOverlaps(parsed.events);
 
 const day = run(['draft-day', '--input', 'examples/day-input.json', '--format', 'markdown']);
 if (!day.includes('Calendar Draft')) throw new Error('day draft markdown missing title');
@@ -35,6 +39,8 @@ const shiftedDeepWork = shiftedJson.events.find((event) => event.sourceTaskIds.i
 if (!shiftedDeepWork || shiftedDeepWork.start === '2026-07-06T09:30:00-04:00') {
   throw new Error('existing event conflict should move LEO-111 out of the occupied 09:30 slot');
 }
+assertChronological(shiftedJson.events);
+assertNoOverlaps(shiftedJson.events.concat(collectedJson.events));
 
 let writebackFailed = false;
 try {
@@ -45,3 +51,22 @@ try {
 if (!writebackFailed) throw new Error('writeback should fail in draft-only alpha');
 
 console.log('Smoke tests passed.');
+
+function assertChronological(events) {
+  for (let index = 1; index < events.length; index += 1) {
+    if (new Date(events[index - 1].start) > new Date(events[index].start)) {
+      throw new Error('events should be sorted chronologically');
+    }
+  }
+}
+
+function assertNoOverlaps(events) {
+  const sorted = [...events].sort((a, b) => new Date(a.start) - new Date(b.start));
+  for (let index = 1; index < sorted.length; index += 1) {
+    const previous = sorted[index - 1];
+    const current = sorted[index];
+    if (new Date(previous.end) > new Date(current.start)) {
+      throw new Error(`events should not overlap: ${previous.title} / ${current.title}`);
+    }
+  }
+}

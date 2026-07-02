@@ -2,11 +2,15 @@
   "period": "week",
   "timezone": "America/Toronto",
   "policy": {
-    "deepWorkWindows": ["09:30-11:30"],
-    "adminWindows": ["14:00-15:00"],
+    "deepWorkWindows": ["09:30-11:30", "15:30-17:00"],
+    "adminWindows": ["14:00-15:00", "16:30-17:00"],
     "reviewWindows": ["20:00-20:30"],
     "maxDeepWorkBlocksPerDay": 2,
-    "defaultBufferMinutes": 30
+    "maxAdminBlocksPerDay": 2,
+    "maxReviewBlocksPerDay": 1,
+    "maxDraftedMinutesPerDay": 300,
+    "defaultBufferMinutes": 30,
+    "includeBuffers": true
   },
   "tasks": [
     {
@@ -15,7 +19,17 @@
       "type": "deep_work",
       "priority": "P1",
       "estimatedMinutes": 90,
-      "source": "linear"
+      "source": "linear",
+      "dueDate": "2026-07-07"
+    },
+    {
+      "id": "calendar-policy",
+      "title": "Turn weekly policy into testable scheduling rules",
+      "type": "deep_work",
+      "priority": "P1",
+      "estimatedMinutes": 120,
+      "source": "daily-os",
+      "preferredDate": "2026-07-08"
     },
     {
       "id": "weekly-review",
@@ -23,7 +37,8 @@
       "type": "review",
       "priority": "P1",
       "estimatedMinutes": 30,
-      "source": "daily-os"
+      "source": "daily-os",
+      "preferredDate": "2026-07-10"
     },
     {
       "id": "admin-follow-up",
@@ -31,7 +46,16 @@
       "type": "admin",
       "priority": "P2",
       "estimatedMinutes": 45,
-      "source": "daily-todo"
+      "source": "daily-todo",
+      "dueDate": "2026-07-06"
+    },
+    {
+      "id": "calendar-release-notes",
+      "title": "Draft calendar planning release notes",
+      "type": "admin",
+      "priority": "P2",
+      "estimatedMinutes": 30,
+      "source": "github"
     }
   ],
   "existingEvents": [

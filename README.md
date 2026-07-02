@@ -34,6 +34,20 @@ calendar-planning-os --help
 - Can be called by `daily-os-feishu` as an optional engine.
 - Can collect existing events from input JSON, JSON files, Google/Apple ICS, or Feishu via `lark-cli`.
 
+## Draft Logic
+
+The planner uses:
+
+- task priority,
+- due date and preferred date,
+- estimated minutes,
+- user-defined work windows,
+- daily block limits,
+- existing calendar events,
+- transition buffers after deep work.
+
+If it cannot place a task cleanly, it leaves a warning instead of writing over calendar time.
+
 ## Input
 
 The CLI accepts a JSON input file with:
