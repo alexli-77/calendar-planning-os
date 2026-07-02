@@ -20,6 +20,22 @@ if (!deepWork || !deepWork.end.includes('T11:00:00')) throw new Error('90-minute
 const day = run(['draft-day', '--input', 'examples/day-input.json', '--format', 'markdown']);
 if (!day.includes('Calendar Draft')) throw new Error('day draft markdown missing title');
 
+const collected = run(['collect-events', '--input', 'examples/week-input.json', '--provider', 'json-file', '--events-file', 'examples/events.json']);
+const collectedJson = JSON.parse(collected);
+if (collectedJson.provider !== 'json-file') throw new Error('json-file provider did not report provider name');
+if (collectedJson.events.length !== 2) throw new Error('json-file provider should collect 2 events');
+
+const ics = run(['collect-events', '--input', 'examples/week-input.json', '--provider', 'google-ics', '--ics-file', 'examples/events.ics']);
+const icsJson = JSON.parse(ics);
+if (icsJson.events.length !== 2) throw new Error('google-ics provider should collect 2 events');
+
+const shifted = run(['draft-week', '--input', 'examples/week-input.json', '--provider', 'json-file', '--events-file', 'examples/events.json', '--format', 'json']);
+const shiftedJson = JSON.parse(shifted);
+const shiftedDeepWork = shiftedJson.events.find((event) => event.sourceTaskIds.includes('LEO-111'));
+if (!shiftedDeepWork || shiftedDeepWork.start === '2026-07-06T09:30:00-04:00') {
+  throw new Error('existing event conflict should move LEO-111 out of the occupied 09:30 slot');
+}
+
 let writebackFailed = false;
 try {
   run(['writeback', '--draft', 'latest']);

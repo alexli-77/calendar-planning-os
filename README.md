@@ -10,6 +10,7 @@ This project turns weekly plans, daily todos, user calendar policy, and existing
 calendar-planning-os --help
 calendar-planning-os draft-week --input examples/week-input.json
 calendar-planning-os draft-day --input examples/day-input.json
+calendar-planning-os collect-events --input examples/week-input.json --provider google-ics --ics-file examples/events.ics
 calendar-planning-os explain --input examples/week-input.json
 calendar-planning-os writeback --draft latest
 ```
@@ -31,6 +32,7 @@ calendar-planning-os --help
 - Does not read or write a real calendar by default.
 - Does not store personal calendar data in the repository.
 - Can be called by `daily-os-feishu` as an optional engine.
+- Can collect existing events from input JSON, JSON files, Google/Apple ICS, or Feishu via `lark-cli`.
 
 ## Input
 
@@ -44,6 +46,10 @@ The CLI accepts a JSON input file with:
 - `constraints`
 
 See [docs/schema.md](docs/schema.md).
+
+Provider setup is in [docs/providers.md](docs/providers.md).
+
+Calendar rules belong in `calendar-policy.md`; start from [calendar-policy.example.md](calendar-policy.example.md).
 
 ## Example
 

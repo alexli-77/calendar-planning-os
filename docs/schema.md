@@ -35,6 +35,10 @@ This project is draft-first. Its job is to produce a proposed schedule, not to w
   "constraints": {
     "startDate": "2026-07-06",
     "days": 5
+  },
+  "evidence": {
+    "calendarProvider": "input",
+    "existingEventCount": 1
   }
 }
 ```
@@ -65,6 +69,32 @@ This project is draft-first. Its job is to produce a proposed schedule, not to w
   }
 }
 ```
+
+## Existing Event
+
+Existing events are read-only calendar constraints.
+
+```json
+{
+  "title": "Existing meeting",
+  "start": "2026-07-06T13:00:00-04:00",
+  "end": "2026-07-06T14:00:00-04:00",
+  "source": "google-ics",
+  "providerEventId": "optional"
+}
+```
+
+## Providers
+
+Provider names:
+
+- `input`
+- `json-file`
+- `google-ics`
+- `apple-ics`
+- `feishu-lark-cli`
+
+See [providers.md](providers.md).
 
 ## Rules
 

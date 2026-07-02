@@ -32,6 +32,20 @@ Never write to a real calendar unless all of these are true:
 - Put admin and follow-up tasks into batches.
 - Mark uncertain items as warnings instead of pretending the schedule is perfect.
 
+## User Rules
+
+Use `calendar-policy.md` as the durable place for user-specific scheduling rules.
+
+Store simple rules there, such as:
+
+- preferred deep work windows,
+- protected personal time,
+- meeting limits,
+- buffer rules,
+- writeback preferences.
+
+Do not bury stable scheduling preferences in prompts or code.
+
 ## Draft Block Types
 
 - `deep_work`: writing, coding, research, strategic thinking.
@@ -59,3 +73,15 @@ Every event should include:
 ## Daily OS Integration
 
 `daily-os-feishu` should call this project as an optional engine. Daily OS owns Feishu messages and user confirmation. This project owns calendar planning logic.
+
+## Provider Boundary
+
+Providers may collect existing events from:
+
+- input JSON,
+- JSON files,
+- Google Calendar private ICS or exported ICS,
+- Apple Calendar exported ICS,
+- Feishu Calendar through `lark-cli`.
+
+Provider collection is read-only. Writeback remains disabled until a separate confirmed workflow exists.
