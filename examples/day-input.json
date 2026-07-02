@@ -2,11 +2,14 @@
   "period": "day",
   "timezone": "America/Toronto",
   "policy": {
-    "deepWorkWindows": ["09:30-11:30"],
-    "adminWindows": ["14:00-15:00"],
+    "deepWorkWindows": ["09:30-11:30", "15:30-17:00"],
+    "adminWindows": ["14:00-15:00", "16:30-17:00"],
     "reviewWindows": ["20:00-20:30"],
     "maxDeepWorkBlocksPerDay": 1,
-    "defaultBufferMinutes": 30
+    "maxAdminBlocksPerDay": 2,
+    "maxDraftedMinutesPerDay": 240,
+    "defaultBufferMinutes": 30,
+    "includeBuffers": true
   },
   "tasks": [
     {
@@ -15,7 +18,8 @@
       "type": "deep_work",
       "priority": "P1",
       "estimatedMinutes": 90,
-      "source": "linear"
+      "source": "linear",
+      "dueDate": "2026-07-06"
     },
     {
       "id": "daily-admin",
@@ -24,6 +28,14 @@
       "priority": "P2",
       "estimatedMinutes": 30,
       "source": "daily-todo"
+    },
+    {
+      "id": "daily-review",
+      "title": "Review what changed and leave tomorrow note",
+      "type": "review",
+      "priority": "P2",
+      "estimatedMinutes": 30,
+      "source": "daily-os"
     }
   ],
   "existingEvents": [

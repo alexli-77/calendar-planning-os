@@ -28,6 +28,7 @@ Never write to a real calendar unless all of these are true:
 - Keep deep work blocks protected and sparse.
 - Leave buffers between demanding blocks.
 - Do not fill the whole day.
+- Use task priority, due date, preferred date, and estimated effort together.
 - Use existing calendar events as hard constraints.
 - Put admin and follow-up tasks into batches.
 - Mark uncertain items as warnings instead of pretending the schedule is perfect.
@@ -69,6 +70,13 @@ Every event should include:
 - source task ids or titles,
 - confidence,
 - warnings when relevant.
+
+Draft quality checks:
+
+- higher priority tasks come before lower priority tasks,
+- due tasks are not pushed later without a warning,
+- daily draft minutes stay under the user's budget when possible,
+- generated buffers do not overlap meetings or task blocks.
 
 ## Daily OS Integration
 
