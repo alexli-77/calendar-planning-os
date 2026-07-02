@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { buildDraft, explainDraft, formatMarkdown } from '../src/planner.mjs';
+import { applyLocalPolicyFiles } from '../src/policy.mjs';
 import { collectEvents, formatEventsMarkdown, mergeCollectedEvents } from '../src/providers.mjs';
 
 const HELP = `calendar-planning-os
@@ -10,14 +11,15 @@ Draft-first calendar planning CLI for Daily OS.
 
 Usage:
   calendar-planning-os --help
-  calendar-planning-os draft-week --input examples/week-input.json [--format json|markdown|both]
-  calendar-planning-os draft-day --input examples/day-input.json [--format json|markdown|both]
+  calendar-planning-os draft-week --input examples/week-input.json [--format json|markdown|both] [--policy-file calendar-decision-policy.md] [--routines-file routines.yaml]
+  calendar-planning-os draft-day --input examples/day-input.json [--format json|markdown|both] [--policy-file calendar-decision-policy.md] [--routines-file routines.yaml]
   calendar-planning-os collect-events --input examples/week-input.json --provider input|json-file|google-ics|apple-ics|feishu-lark-cli
   calendar-planning-os explain --input examples/week-input.json
   calendar-planning-os writeback --draft latest
 
 Notes:
   - draft-week and draft-day produce draft output only.
+  - policy-file and routines-file are local inputs; examples live under policies/.
   - Feishu, Google, and Apple providers collect existing events only.
   - writeback is disabled in this alpha skeleton.
 `;
@@ -78,7 +80,7 @@ async function main() {
     const input = readJson(flags.input);
     const expectedPeriod = command === 'draft-week' ? 'week' : 'day';
     const events = await collectEvents(input, flags);
-    const draftInput = mergeCollectedEvents(input, events, flags.provider || 'input');
+    const draftInput = applyLocalPolicyFiles(mergeCollectedEvents(input, events, flags.provider || 'input'), flags);
     const draft = buildDraft(draftInput, { expectedPeriod });
     printDraft(draft, flags.format || 'both');
     return;
@@ -99,7 +101,7 @@ async function main() {
   if (command === 'explain') {
     const input = readJson(flags.input);
     const events = await collectEvents(input, flags);
-    const draftInput = mergeCollectedEvents(input, events, flags.provider || 'input');
+    const draftInput = applyLocalPolicyFiles(mergeCollectedEvents(input, events, flags.provider || 'input'), flags);
     const draft = buildDraft(draftInput, { expectedPeriod: input.period || 'week' });
     console.log(explainDraft(draft));
     return;

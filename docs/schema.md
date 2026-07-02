@@ -44,7 +44,9 @@ This project is draft-first. Its job is to produce a proposed schedule, not to w
   },
   "evidence": {
     "calendarProvider": "input",
-    "existingEventCount": 1
+    "existingEventCount": 1,
+    "routinesFile": "policies/routines.example.yaml",
+    "routineEventCount": 3
   }
 }
 ```
@@ -90,6 +92,24 @@ Existing events are read-only calendar constraints.
 }
 ```
 
+## Routine Event
+
+Routine events come from `--routines-file`. They are included in the draft output and also act as conflict constraints.
+
+```json
+{
+  "title": "Routine: Lunch",
+  "start": "2026-07-06T12:00:00-04:00",
+  "end": "2026-07-06T13:00:00-04:00",
+  "type": "recovery",
+  "sourceTaskIds": ["routine:lunch"],
+  "confidence": "high",
+  "warnings": [],
+  "protected": true,
+  "source": "routine"
+}
+```
+
 ## Providers
 
 Provider names:
@@ -127,6 +147,7 @@ See [providers.md](providers.md).
 
 - Draft events must not overlap existing events.
 - Existing events are hard constraints.
+- Routine events from `routines.yaml` are included as protected draft blocks and conflict constraints.
 - Earlier priorities and due dates are placed first.
 - Preferred dates are honored when possible.
 - Deep work can automatically receive a buffer after it.

@@ -10,6 +10,7 @@ This project turns weekly plans, daily todos, user calendar policy, and existing
 calendar-planning-os --help
 calendar-planning-os draft-week --input examples/week-input.json
 calendar-planning-os draft-day --input examples/day-input.json
+calendar-planning-os draft-week --input examples/week-input.json --routines-file policies/routines.example.yaml --policy-file policies/calendar-decision-policy.example.md
 calendar-planning-os collect-events --input examples/week-input.json --provider google-ics --ics-file examples/events.ics
 calendar-planning-os explain --input examples/week-input.json
 calendar-planning-os writeback --draft latest

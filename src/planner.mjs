@@ -22,8 +22,13 @@ export function buildDraft(input, options = {}) {
   const warnings = [];
   const events = [];
   const existingEvents = input.existingEvents || [];
+  const routineEvents = input.routineEvents || [];
   const tasks = [...(input.tasks || [])].sort((a, b) => compareTasks(a, b, startDate));
   const dayUsage = new Map();
+
+  for (const routine of routineEvents) {
+    events.push(routine);
+  }
 
   for (const task of tasks) {
     const type = normalizeType(task.type);
@@ -61,6 +66,7 @@ export function buildDraft(input, options = {}) {
     timezone,
     events: sortEvents(events),
     warnings,
+    evidence: input.evidence || {},
     writeback: {
       supported: false,
       reason: 'draft-only alpha'
@@ -82,6 +88,10 @@ export function formatMarkdown(draft) {
   if (draft.warnings.length) {
     lines.push('', '## Warnings');
     for (const warning of draft.warnings) lines.push(`- ${warning}`);
+  }
+  if (draft.evidence?.localPolicyNotes?.length) {
+    lines.push('', '## Local Policy');
+    for (const note of draft.evidence.localPolicyNotes) lines.push(`- ${note}`);
   }
   return lines.join('\n');
 }
@@ -108,6 +118,7 @@ function validateInput(input, expectedPeriod) {
   if (!input.constraints?.startDate) throw new Error('Input requires constraints.startDate.');
   if (!Array.isArray(input.tasks)) throw new Error('Input requires tasks array.');
   if (input.existingEvents && !Array.isArray(input.existingEvents)) throw new Error('existingEvents must be an array.');
+  if (input.routineEvents && !Array.isArray(input.routineEvents)) throw new Error('routineEvents must be an array.');
 }
 
 function compareTasks(a, b, startDate) {
