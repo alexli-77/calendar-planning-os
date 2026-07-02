@@ -42,3 +42,19 @@ Skills do not write calendars. They return advice. The planner still has to:
 - respect fixed routines,
 - apply explicit user instructions,
 - produce warnings when a schedule would be overloaded.
+
+## CLI Usage
+
+Use local policy files with draft commands:
+
+```bash
+node bin/calendar-planning-os.mjs draft-week \
+  --input examples/week-input.json \
+  --policy-file policies/calendar-decision-policy.example.md \
+  --routines-file policies/routines.example.yaml \
+  --format markdown
+```
+
+`--policy-file` loads the decision policy as evidence for the draft.
+
+`--routines-file` expands fixed routines across the requested day/week range. Routine blocks appear in the draft and also prevent task blocks from being placed on top of them.

@@ -24,6 +24,24 @@ assertNoOverlaps(parsed.events);
 const day = run(['draft-day', '--input', 'examples/day-input.json', '--format', 'markdown']);
 if (!day.includes('Calendar Draft')) throw new Error('day draft markdown missing title');
 
+const routineDraft = run([
+  'draft-week',
+  '--input',
+  'examples/week-input.json',
+  '--policy-file',
+  'policies/calendar-decision-policy.example.md',
+  '--routines-file',
+  'policies/routines.example.yaml',
+  '--format',
+  'json'
+]);
+const routineJson = JSON.parse(routineDraft);
+const lunch = routineJson.events.find((event) => event.title === 'Routine: Lunch' && event.start === '2026-07-06T12:00:00-04:00');
+if (!lunch) throw new Error('routines file should add Monday lunch routine to the draft');
+if (routineJson.evidence?.routineEventCount !== 13) throw new Error('routine evidence should report expanded routine event count');
+assertChronological(routineJson.events);
+assertNoOverlaps(routineJson.events);
+
 const collected = run(['collect-events', '--input', 'examples/week-input.json', '--provider', 'json-file', '--events-file', 'examples/events.json']);
 const collectedJson = JSON.parse(collected);
 if (collectedJson.provider !== 'json-file') throw new Error('json-file provider did not report provider name');

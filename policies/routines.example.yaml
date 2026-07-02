@@ -22,7 +22,11 @@ fixed_routines:
     type: review
     protected: false
 
+# The current alpha expands these routines into visible draft blocks.
+# Protected routines are intended to act as hard constraints.
+
 routine_rules:
   - Existing calendar events override these examples.
-  - Protected routines should not be moved unless the user explicitly asks.
-  - Non-protected routines can move when the day is crowded.
+  - Current alpha treats fixed routines as visible draft blocks and placement constraints.
+  - Protected routines should not be moved in future writeback flows unless the user explicitly asks.
+  - Non-protected routines are marked for future rescheduling support.
