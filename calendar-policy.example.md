@@ -43,6 +43,13 @@ Keep it local. Do not commit your real personal calendar details.
 - If a task has a preferred date, try that date first.
 - If the day already feels full, leave the task as a warning instead of overpacking.
 
+## Optional Advisory Skills
+
+<!-- Skills advise; the calendar decision policy makes the final call. -->
+
+- Use `energy-time-control` for energy windows, recovery, and block shape.
+- Use `cognitive-clarity-planning` before scheduling vague work.
+
 ## Calendar Writeback
 
 <!-- Writeback is disabled in the current alpha. Keep this as a future preference. -->

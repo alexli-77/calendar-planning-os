@@ -47,6 +47,16 @@ Store simple rules there, such as:
 
 Do not bury stable scheduling preferences in prompts or code.
 
+Use `policies/calendar-decision-policy.example.md` as the template for the planner's final decision order.
+Use `policies/routines.example.yaml` as the template for fixed personal routines that do not appear in OKRs or todo lists.
+
+Optional advisory skills live under `skills/`:
+
+- `energy-time-control`: energy, focus, recovery, and block-shape advice.
+- `cognitive-clarity-planning`: clarity and task-readiness advice.
+
+Skills advise; the calendar decision policy decides.
+
 ## Draft Block Types
 
 - `deep_work`: writing, coding, research, strategic thinking.

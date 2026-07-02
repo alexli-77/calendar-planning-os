@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cognitive Clarity Planning"
+  short_description: "Clarify vague tasks before scheduling"
+  default_prompt: "Use $cognitive-clarity-planning to decide whether tasks are clear enough to schedule or need breakdown first."

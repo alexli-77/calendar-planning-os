@@ -65,6 +65,12 @@ Provider setup is in [docs/providers.md](docs/providers.md).
 
 Calendar rules belong in `calendar-policy.md`; start from [calendar-policy.example.md](calendar-policy.example.md).
 
+Calendar decision rules can also be split into:
+
+- [policies/calendar-decision-policy.example.md](policies/calendar-decision-policy.example.md) for the final decision order.
+- [policies/routines.example.yaml](policies/routines.example.yaml) for fixed user routines that do not appear in OKRs.
+- [skills/energy-time-control](skills/energy-time-control/SKILL.md) and [skills/cognitive-clarity-planning](skills/cognitive-clarity-planning/SKILL.md) as optional advisory skills.
+
 ## Example
 
 ```bash

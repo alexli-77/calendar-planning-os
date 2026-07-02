@@ -1,0 +1,4 @@
+interface:
+  display_name: "Energy Time Control"
+  short_description: "Schedule work around energy rhythms"
+  default_prompt: "Use $energy-time-control to advise where demanding work, admin, recovery, and review blocks should go."

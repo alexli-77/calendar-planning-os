@@ -2,6 +2,11 @@
 .env
 .env.*
 config.yaml
+calendar-policy.md
+calendar-decision-policy.md
+routines.yaml
+policies/calendar-decision-policy.md
+policies/routines.yaml
 data/
 drafts/
 logs/
