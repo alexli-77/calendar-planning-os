@@ -1,0 +1,18 @@
+{
+  "name": "calendar-planning-os",
+  "version": "0.1.0-alpha.0",
+  "description": "Draft-first calendar planning CLI and skill for Daily OS.",
+  "type": "module",
+  "bin": {
+    "calendar-planning-os": "bin/calendar-planning-os.mjs"
+  },
+  "scripts": {
+    "test": "node scripts/smoke-test.mjs",
+    "smoke": "node scripts/smoke-test.mjs",
+    "privacy:scan": "node scripts/privacy-scan.mjs"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

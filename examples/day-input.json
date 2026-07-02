@@ -1,0 +1,40 @@
+{
+  "period": "day",
+  "timezone": "America/Toronto",
+  "policy": {
+    "deepWorkWindows": ["09:30-11:30"],
+    "adminWindows": ["14:00-15:00"],
+    "reviewWindows": ["20:00-20:30"],
+    "maxDeepWorkBlocksPerDay": 1,
+    "defaultBufferMinutes": 30
+  },
+  "tasks": [
+    {
+      "id": "LEO-111",
+      "title": "Bootstrap calendar-planning-os optional CLI and skill",
+      "type": "deep_work",
+      "priority": "P1",
+      "estimatedMinutes": 90,
+      "source": "linear"
+    },
+    {
+      "id": "daily-admin",
+      "title": "Send follow-up and update planning notes",
+      "type": "admin",
+      "priority": "P2",
+      "estimatedMinutes": 30,
+      "source": "daily-todo"
+    }
+  ],
+  "existingEvents": [
+    {
+      "title": "Lunch",
+      "start": "2026-07-06T12:00:00-04:00",
+      "end": "2026-07-06T13:00:00-04:00"
+    }
+  ],
+  "constraints": {
+    "startDate": "2026-07-06",
+    "days": 1
+  }
+}

@@ -1,0 +1,19 @@
+user:
+  name: YOUR_NAME
+  timezone: America/Toronto
+
+calendar:
+  mode: draft_only
+  provider: none
+  default_calendar: null
+
+policy:
+  path: calendar-policy.md
+
+drafts:
+  output_dir: drafts
+
+safety:
+  require_confirmation_before_writeback: true
+  allow_writeback: false
+  allow_overwrite: false

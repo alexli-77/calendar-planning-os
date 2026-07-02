@@ -1,0 +1,48 @@
+{
+  "period": "week",
+  "timezone": "America/Toronto",
+  "policy": {
+    "deepWorkWindows": ["09:30-11:30"],
+    "adminWindows": ["14:00-15:00"],
+    "reviewWindows": ["20:00-20:30"],
+    "maxDeepWorkBlocksPerDay": 2,
+    "defaultBufferMinutes": 30
+  },
+  "tasks": [
+    {
+      "id": "LEO-111",
+      "title": "Bootstrap calendar-planning-os optional CLI and skill",
+      "type": "deep_work",
+      "priority": "P1",
+      "estimatedMinutes": 90,
+      "source": "linear"
+    },
+    {
+      "id": "weekly-review",
+      "title": "Review weekly plan and update Feishu Weekly",
+      "type": "review",
+      "priority": "P1",
+      "estimatedMinutes": 30,
+      "source": "daily-os"
+    },
+    {
+      "id": "admin-follow-up",
+      "title": "Batch email and Linear follow-up",
+      "type": "admin",
+      "priority": "P2",
+      "estimatedMinutes": 45,
+      "source": "daily-todo"
+    }
+  ],
+  "existingEvents": [
+    {
+      "title": "Existing meeting",
+      "start": "2026-07-06T13:00:00-04:00",
+      "end": "2026-07-06T14:00:00-04:00"
+    }
+  ],
+  "constraints": {
+    "startDate": "2026-07-06",
+    "days": 5
+  }
+}

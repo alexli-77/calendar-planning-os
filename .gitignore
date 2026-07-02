@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.env.*
+config.yaml
+data/
+drafts/
+logs/
+node_modules/
+dist/
+coverage/
